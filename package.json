@@ -1,22 +1,35 @@
 {
   "name": "jooks",
-  "version": "0.1.0",
-  "private": true,
-  "dependencies": {
-    "@types/jest": "24.0.11",
+  "version": "0.0.15",
+  "private": false,
+  "main": "Jooks.js",
+  "types": "Jooks.d.ts",
+  "description": "An idiot-proof way of testing your custom react hooks",
+  "devDependencies": {
+    "@types/jest": "^24.0.11",
+    "@types/lodash": "^4.14.123",
     "@types/node": "11.11.2",
     "@types/react": "16.8.7",
     "@types/react-dom": "16.8.2",
+    "jest-fetch-mock": "^2.1.1",
     "react": "^16.8.4",
     "react-dom": "^16.8.4",
+    "react-hooks-testing-library": "^0.3.6",
     "react-scripts": "2.1.8",
+    "react-testing-library": "^6.0.0",
     "typescript": "3.3.3333"
+  },
+  "dependencies": {
+    "lodash": "^4.17.11"
+  },
+  "peerDependencies": {
+    "jest": "*",
+    "react": "^16.8.0"
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "prepare": "tsc -p ./tsconfig.build.json",
+    "test": "react-scripts test"
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -26,5 +39,21 @@
     "not dead",
     "not ie <= 11",
     "not op_mini all"
-  ]
+  ],
+  "author": {
+    "name": "Antoine Jaussoin",
+    "email": "ant+npm@jaussoin.com",
+    "url": "https://github.com/antoinejaussoin/jooks"
+  },
+  "keywords": [
+    "jest",
+    "react",
+    "hooks",
+    "react hooks",
+    "testing",
+    "unit test",
+    "library"
+  ],
+  "homepage": "https://github.com/antoinejaussoin/jooks",
+  "readme": "README.md"
 }

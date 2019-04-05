@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState, useDebugValue } from 'react';
 
 interface Activity {
   activity: string;
@@ -23,6 +23,8 @@ export default () => {
   useEffect(() => {
     fetchData();
   }, []);
+
+  useDebugValue(activity, (activity) => (activity ? activity.activity : 'not loaded'));
 
   return { activity, next: fetchData };
 };

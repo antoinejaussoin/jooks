@@ -1,6 +1,8 @@
-import React, { Component } from 'react';
+import React from 'react';
 import './App.css';
 import useLoadActivity from './useLoadActivity';
+
+// This is an example of a hook that works in real-life
 
 const App = () => {
   const { activity, next } = useLoadActivity();
