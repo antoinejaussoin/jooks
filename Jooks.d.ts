@@ -41,7 +41,7 @@ export declare class Jooks<R> {
      * effects are not taking more than 1 event-loop to execute, or more than 1ms.
      * @param wait wait time in millisecond. Defaults to 1.
      */
-    wait(wait?: number): Promise<{}>;
+    wait(wait?: number): Promise<unknown>;
     /**
      * Allows setting some value to a Context before the hook is run. You need to do this if your hook
      * contains any useContext call.
