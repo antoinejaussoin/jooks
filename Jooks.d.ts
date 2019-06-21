@@ -12,6 +12,7 @@ export declare class Jooks<R> {
     private refStore;
     private memoStore;
     private reducerStore;
+    private cleanupFunctions;
     constructor(hookFunction: () => R, verbose?: boolean);
     /**
      * This should be run before each test.
@@ -32,6 +33,7 @@ export declare class Jooks<R> {
      * @param wait wait time in millisecond. Defaults to 1.
      */
     mount(wait?: number): Promise<R>;
+    unmount(wait?: number): Promise<void>;
     /**
      * Executes your hook, and returns the result
      */
@@ -64,6 +66,7 @@ export declare class Jooks<R> {
     private mockUseContext;
     private render;
     private fireEffects;
+    private fireEffectsCleanup;
 }
 export declare function init<T>(hook: () => T, verbose?: boolean): Jooks<T>;
 export default init;

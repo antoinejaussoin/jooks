@@ -66,6 +66,7 @@ var Jooks = /** @class */ (function () {
         this.refStore = new HookStore('useRef');
         this.memoStore = new HookStore('useMemo');
         this.reducerStore = new HookStore('useReducer');
+        this.cleanupFunctions = [];
     }
     /**
      * This should be run before each test.
@@ -123,6 +124,21 @@ var Jooks = /** @class */ (function () {
                     case 1:
                         _a.sent();
                         return [2 /*return*/, this.render()];
+                }
+            });
+        });
+    };
+    Jooks.prototype.unmount = function (wait) {
+        if (wait === void 0) { wait = 1; }
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        this.fireEffectsCleanup();
+                        return [4 /*yield*/, this.wait(wait)];
+                    case 1:
+                        _a.sent();
+                        return [2 /*return*/];
                 }
             });
         });
@@ -403,7 +419,13 @@ var Jooks = /** @class */ (function () {
                 if (_this.verbose) {
                     console.log('Firing effect: ', effect);
                 }
-                effect.effect();
+                var cleanup = effect.effect();
+                if (lodash_1.isFunction(cleanup)) {
+                    _this.cleanupFunctions[_this.effectStore.pointer] = cleanup;
+                    if (_this.verbose) {
+                        console.log('Storing cleanup function for ', _this.cleanupFunctions.length);
+                    }
+                }
                 effect.hasRun = true;
                 _this.render();
             }
@@ -413,10 +435,28 @@ var Jooks = /** @class */ (function () {
                 if (_this.verbose) {
                     console.log('Firing layout effect: ', effect);
                 }
-                effect.effect();
+                var cleanup = effect.effect();
+                if (lodash_1.isFunction(cleanup)) {
+                    _this.cleanupFunctions[_this.effectStore.pointer + 10000] = cleanup;
+                    if (_this.verbose) {
+                        console.log('Storing cleanup function for ', effect);
+                    }
+                }
                 effect.hasRun = true;
                 _this.render();
             }
+        });
+    };
+    Jooks.prototype.fireEffectsCleanup = function () {
+        var _this = this;
+        if (this.verbose) {
+            console.log('Looking for effects to clean', this.cleanupFunctions);
+        }
+        this.cleanupFunctions.forEach(function (cleanupFunction) {
+            if (_this.verbose) {
+                console.log('Cleaning effect: ', cleanupFunction);
+            }
+            cleanupFunction();
         });
     };
     return Jooks;
