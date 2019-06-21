@@ -1,6 +1,7 @@
 import 'jest';
 import useEffectSimple from '../useEffectExample';
 import useEffectWithDependency from '../useEffectWithDependencyExample';
+import useEffectWithCleanup from '../useEffectWithCleanup';
 import init from '../Jooks'; // In your code, do: import init from 'jooks';
 
 describe('Testing useEffect hook', () => {
@@ -47,5 +48,27 @@ describe('Testing useEffect hook with dependency', () => {
     jooks.run().setSomeOtherDependency(1);
     await jooks.wait();
     expect(jooks.run().result).toBe('xx');
+  });
+});
+
+describe('Testing useEffect hook with cleanup', () => {
+  const fakeSubscription = {
+    connect: jest.fn(),
+    disconnect: jest.fn(),
+  };
+  const jooks = init(() => useEffectWithCleanup(fakeSubscription), false);
+  it('It should return some value', () => {
+    expect(jooks.run()).toBe('foo');
+  });
+
+  it('It should have been calling the connect function after mount', async () => {
+    await jooks.mount();
+    expect(fakeSubscription.connect).toHaveBeenCalledTimes(1);
+    expect(fakeSubscription.disconnect).not.toHaveBeenCalled();
+  });
+
+  it('It should have been calling the disconnect function on unmount', async () => {
+    await jooks.unmount();
+    expect(fakeSubscription.disconnect).toHaveBeenCalledTimes(1);
   });
 });

@@ -1,5 +1,5 @@
 import React from 'react';
-import { isEqual } from 'lodash';
+import { isEqual, isFunction } from 'lodash';
 import 'jest';
 
 /* tslint:disable */
@@ -36,6 +36,7 @@ export class Jooks<R> {
   private refStore: HookStore<any>;
   private memoStore: HookStore<MemoItem>;
   private reducerStore: HookStore<ReducerItem>;
+  private cleanupFunctions: Function[];
 
   constructor(private hookFunction: () => R, private verbose: boolean = false) {
     this.stateStore = new HookStore('useState');
@@ -47,6 +48,7 @@ export class Jooks<R> {
     this.refStore = new HookStore('useRef');
     this.memoStore = new HookStore('useMemo');
     this.reducerStore = new HookStore('useReducer');
+    this.cleanupFunctions = [];
   }
 
   /**
@@ -101,6 +103,11 @@ export class Jooks<R> {
     this.fireEffects();
     await this.wait(wait);
     return this.render();
+  }
+
+  public async unmount(wait: number = 1) {
+    this.fireEffectsCleanup();
+    await this.wait(wait);
   }
 
   /**
@@ -393,7 +400,13 @@ export class Jooks<R> {
         if (this.verbose) {
           console.log('Firing effect: ', effect);
         }
-        effect.effect();
+        const cleanup = effect.effect();
+        if (isFunction(cleanup)) {
+          this.cleanupFunctions[this.effectStore.pointer] = cleanup;
+          if (this.verbose) {
+            console.log('Storing cleanup function for ', this.cleanupFunctions.length);
+          }
+        }
         effect.hasRun = true;
         this.render();
       }
@@ -403,10 +416,28 @@ export class Jooks<R> {
         if (this.verbose) {
           console.log('Firing layout effect: ', effect);
         }
-        effect.effect();
+        const cleanup = effect.effect();
+        if (isFunction(cleanup)) {
+          this.cleanupFunctions[this.effectStore.pointer + 10000] = cleanup;
+          if (this.verbose) {
+            console.log('Storing cleanup function for ', effect);
+          }
+        }
         effect.hasRun = true;
         this.render();
       }
+    });
+  }
+
+  private fireEffectsCleanup() {
+    if (this.verbose) {
+      console.log('Looking for effects to clean', this.cleanupFunctions);
+    }
+    this.cleanupFunctions.forEach((cleanupFunction) => {
+      if (this.verbose) {
+        console.log('Cleaning effect: ', cleanupFunction);
+      }
+      cleanupFunction();
     });
   }
 }
