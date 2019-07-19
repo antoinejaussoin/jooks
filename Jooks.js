@@ -147,7 +147,11 @@ var Jooks = /** @class */ (function () {
      * Executes your hook, and returns the result
      */
     Jooks.prototype.run = function () {
-        return this.render();
+        var args = [];
+        for (var _i = 0; _i < arguments.length; _i++) {
+            args[_i] = arguments[_i];
+        }
+        return this.render.apply(this, args);
     };
     /**
      * Use this to wait for Effects to be executed. Remember to mock all your API calls so that the asyncronous
@@ -397,6 +401,10 @@ var Jooks = /** @class */ (function () {
         return contextValue;
     };
     Jooks.prototype.render = function () {
+        var args = [];
+        for (var _i = 0; _i < arguments.length; _i++) {
+            args[_i] = arguments[_i];
+        }
         this.stateStore.start();
         this.effectStore.start();
         this.layoutEffectStore.start();
@@ -406,7 +414,7 @@ var Jooks = /** @class */ (function () {
         this.refStore.start();
         this.memoStore.start();
         this.reducerStore.start();
-        return this.hookFunction();
+        return this.hookFunction.apply(this, args);
     };
     Jooks.prototype.fireEffects = function () {
         var _this = this;
