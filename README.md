@@ -258,6 +258,45 @@ describe('Testing useContext hook', () => {
 });
 ```
 
+### Custom hooks with arguments
+
+Hooks often rely on passed-in arguments to compute a value, for example:
+
+```javascript
+import { useContext } from 'react';
+import { Context1 } from './ExampleContext';
+
+const useContextWithArgsExample = bar => {
+  const { foo } = useContext(Context1);
+  return foo + ':' + bar;
+};
+
+export default useContextWithArgsExample;
+```
+
+To test these, we can simply pass in the argument when we call `.run()`:
+
+```javascript
+import 'jest';
+import useContextWithArgsExample from '../useContextWithArgsExample';
+import { Context1 } from '../ExampleContext';
+import init from 'jooks';
+
+describe('Testing useContextWithArgsExample hook', () => {
+  const jooks = init(useContextWithArgsExample);
+
+  beforeEach(() => {
+    jooks.setContext(Context1, { foo: 'baz' });
+  });
+
+  it('It should give the correct values', () => {
+    // Here it should compute the hook's return value based on what you passed in
+    const foo = jooks.run('bar');
+    expect(foo).toBe('baz:bar');
+  });
+});
+```
+
 ## API
 
 The library exposes 3 things:
