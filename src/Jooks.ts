@@ -26,6 +26,8 @@ interface ReducerItem {
   currentState: any;
 }
 
+type HookFunction<T> = (...args: any[]) => T;
+
 export class Jooks<R> {
   private stateStore: HookStore<any>;
   private effectStore: HookStore<EffectItem>;
@@ -38,7 +40,7 @@ export class Jooks<R> {
   private reducerStore: HookStore<ReducerItem>;
   private cleanupFunctions: Function[];
 
-  constructor(private hookFunction: () => R, private verbose: boolean = false) {
+  constructor(private hookFunction: HookFunction<R>, private verbose: boolean = false) {
     this.stateStore = new HookStore('useState');
     this.effectStore = new HookStore('useEffect');
     this.layoutEffectStore = new HookStore('useLayoutEffect');
@@ -113,8 +115,8 @@ export class Jooks<R> {
   /**
    * Executes your hook, and returns the result
    */
-  public run() {
-    return this.render();
+  public run(...args: any[]) {
+    return this.render(...args);
   }
 
   /**
@@ -377,7 +379,7 @@ export class Jooks<R> {
     return contextValue;
   }
 
-  private render(): R {
+  private render(...args: any[]): R {
     this.stateStore.start();
     this.effectStore.start();
     this.layoutEffectStore.start();
@@ -387,7 +389,7 @@ export class Jooks<R> {
     this.refStore.start();
     this.memoStore.start();
     this.reducerStore.start();
-    return this.hookFunction();
+    return this.hookFunction(...args);
   }
 
   private fireEffects() {
@@ -442,7 +444,7 @@ export class Jooks<R> {
   }
 }
 
-export function init<T>(hook: () => T, verbose?: boolean) {
+export function init<T>(hook: HookFunction<T>, verbose?: boolean) {
   const mock = new Jooks(hook, verbose);
   beforeEach(() => mock.setup());
   afterEach(() => mock.cleanup());
