@@ -304,7 +304,7 @@ The library exposes 3 things:
 - The default export is an initialisation function, as shown in the examples above, hidding the complexity away. This is Jest-specific.
 - `Jooks` class: this is the class that contains the logic and wraps your hook. It is independent from any testing framework so it should be used with other testing frameworks.
 
-### `function init<T>(hook: () => T, verbose?: boolean)` (default export)
+### `function init<T>(hook: (...args: any[]) => T, verbose?: boolean)` (default export)
 
 This function is meant to be called within your test's `describe` function.
 It takes one compulsory argument, and one optional flag:
