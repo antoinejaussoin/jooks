@@ -1,15 +1,15 @@
 {
   "name": "jooks",
-  "version": "0.0.16",
+  "version": "1.0.0",
   "private": false,
   "main": "Jooks.js",
   "types": "Jooks.d.ts",
   "description": "An idiot-proof way of testing your custom react hooks",
   "devDependencies": {
     "@types/jest": "^24.0.15",
-    "@types/lodash": "^4.14.134",
-    "@types/node": "12.0.8",
-    "@types/react": "16.8.22",
+    "@types/lodash": "^4.14.136",
+    "@types/node": "12.6.8",
+    "@types/react": "16.8.23",
     "@types/react-dom": "16.8.4",
     "jest-fetch-mock": "^2.1.2",
     "react": "^16.8.4",
@@ -17,10 +17,10 @@
     "react-hooks-testing-library": "^0.6.0",
     "react-scripts": "3.0.1",
     "react-testing-library": "^8.0.1",
-    "typescript": "3.5.2"
+    "typescript": "3.5.3"
   },
   "dependencies": {
-    "lodash": "^4.17.11"
+    "lodash": "^4.17.15"
   },
   "peerDependencies": {
     "jest": "*",
