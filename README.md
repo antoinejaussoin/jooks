@@ -258,29 +258,90 @@ describe('Testing useContext hook', () => {
 });
 ```
 
+### Custom hooks with arguments
+
+Hooks often rely on passed-in arguments to compute a value, for example:
+
+```javascript
+import { useContext } from 'react';
+import { Context1 } from './ExampleContext';
+
+const useContextWithArgsExample = bar => {
+  const { foo } = useContext(Context1);
+  return foo + ':' + bar;
+};
+
+export default useContextWithArgsExample;
+```
+
+To test these, we can simply pass in the argument when we call `.run()`:
+
+```javascript
+import 'jest';
+import useContextWithArgsExample from '../useContextWithArgsExample';
+import { Context1 } from '../ExampleContext';
+import init from 'jooks';
+
+describe('Testing useContextWithArgsExample hook', () => {
+  const jooks = init(useContextWithArgsExample);
+
+  beforeEach(() => {
+    jooks.setContext(Context1, { foo: 'baz' });
+  });
+
+  it('It should give the correct values', () => {
+    // Here it should compute the hook's return value based on what you passed in
+    const foo = jooks.run('bar');
+    expect(foo).toBe('baz:bar');
+  });
+});
+```
+
 ## API
 
 The library exposes 3 things:
 
 - The default export is an initialisation function, as shown in the examples above, hidding the complexity away. This is Jest-specific.
-- `Jooks` class: this is the class that contains the logic and wraps your hook. It is independent from any testing framework so it should be used with other testing frameworks.
+- `Jooks` class: this is the class that contains the logic and wraps your hook. It is independent from any testing framework so it could be used with other testing frameworks.
 
-### `function init<T>(hook: () => T, verbose?: boolean)` (default export)
+### `function init<T>(hook: (...args: any[]) => T, verbose?: boolean)` (default export)
 
 This function is meant to be called within your test's `describe` function.
 It takes one compulsory argument, and one optional flag:
 
-- `hook`: This is a function that calls your hook
+- `hook`: This is a function that calls your hook, or the hook function itself
 - `verbose` (optional): Whether to enable the verbose mode, logging information to the console, for debugging purpose.
 
 ```javascript
-const jooks = init(() => useContextExample());
+const jooks = init(() => useContextExample(someVariable));
+// or
+const jooks = init(useContextExample);
 ```
 
 or, to enable the verbose mode;
 
 ```javascript
 const jooks = init(() => useContextExample(), true);
+// or
+const jooks = init(useContextExample, true);
+```
+
+#### Two ways to initialise Jooks
+
+As see above, you have two ways of initialising a hook :
+
+In the first one, you instantiate your hook on initialisation, with function arguments that are not going to change for the rest of the test:
+
+```javascript
+const jooks = init(() => useContextExample(someVariable));
+jooks.run();
+```
+
+Alternatively, you can specify the Hook function directly, and provide its argument on each `run()` call, like so:
+
+```javascript
+const jooks = init(useContextExample);
+jooks.run(someVariable);
 ```
 
 ### Jooks
@@ -290,7 +351,7 @@ This is the object you get on the third parameter of the describe function.
 It exposes 3 methods that you should care about:
 
 - `async mount(wait: number = 1): Promise<R>`: ensure your hook ran all its effect "on mount"
-- `run()`: this runs your hook function and returns the result. This is usually what you are testing.
+- `run(...hooksParams?)`: this runs your hook function and returns the result. This is usually what you are testing.
 - `async wait(wait: number = 1)`: if you are expecting an asynchronous effect to fire, call this to wait until it's resolved
 
 An additional 2 methods are dedicated to Context:
@@ -303,7 +364,7 @@ There are 2 other public method that you shouldn't use if you are using the init
 - `setup`: this is to be run before every test. This is done automatically if you are using the init function.
 - `cleanup`: this is to be run after every test. This is done automatically if you are using the init function.
 
-#### async mount(wait: number = 1): Promise<R>
+#### async mount(wait: number = 1): Promise<void>
 
 Use this function at the beginning of a test to wait for `useEffect` to fire.
 
@@ -324,7 +385,7 @@ it("Should load activities properly", async () => {
 });
 ```
 
-#### run()
+#### run(...hooksParams?)
 
 This function runs your hook function. Use this to test the hook output.
 
@@ -346,6 +407,10 @@ This is only necessary when your Hook uses `useContext`. You need to call this a
 - Why Jooks? it's a mix of Jest and Hooks.
 - Can I use this? Since it's a testing library (and not a piece of code that's going to production), yes go ahead. The API is likely to change a bit before being stable though, so you might want to pin down your version.
 - There must be a Medium article about that? [Yes, there is.](https://medium.com/@jantoine/another-take-on-testing-custom-react-hooks-4461458935d4)
+
+## Thanks
+
+- Thanks to [@bronter](https://github.com/bronter) for suggesting and implementing the ability to specify a hook function parameters on `run()` instead of just during initialisation.
 
 ## Can I contribute?
 

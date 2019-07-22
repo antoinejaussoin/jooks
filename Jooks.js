@@ -54,9 +54,22 @@ var lodash_1 = require("lodash");
 require("jest");
 var Jooks = /** @class */ (function () {
     function Jooks(hookFunction, verbose) {
+        var _this = this;
         if (verbose === void 0) { verbose = false; }
         this.hookFunction = hookFunction;
         this.verbose = verbose;
+        /**
+         * Executes your hook, and returns the result
+         */
+        this.run = (function () {
+            var args = [];
+            for (var _i = 0; _i < arguments.length; _i++) {
+                args[_i] = arguments[_i];
+            }
+            // This weird TypeScript hack ensures that the "run" function has the
+            // exact same signature as your hook.
+            return _this.render.apply(_this, args);
+        });
         this.stateStore = new HookStore('useState');
         this.effectStore = new HookStore('useEffect');
         this.layoutEffectStore = new HookStore('useLayoutEffect');
@@ -123,7 +136,7 @@ var Jooks = /** @class */ (function () {
                         return [4 /*yield*/, this.wait(wait)];
                     case 1:
                         _a.sent();
-                        return [2 /*return*/, this.render()];
+                        return [2 /*return*/];
                 }
             });
         });
@@ -142,12 +155,6 @@ var Jooks = /** @class */ (function () {
                 }
             });
         });
-    };
-    /**
-     * Executes your hook, and returns the result
-     */
-    Jooks.prototype.run = function () {
-        return this.render();
     };
     /**
      * Use this to wait for Effects to be executed. Remember to mock all your API calls so that the asyncronous
@@ -397,6 +404,10 @@ var Jooks = /** @class */ (function () {
         return contextValue;
     };
     Jooks.prototype.render = function () {
+        var args = [];
+        for (var _i = 0; _i < arguments.length; _i++) {
+            args[_i] = arguments[_i];
+        }
         this.stateStore.start();
         this.effectStore.start();
         this.layoutEffectStore.start();
@@ -406,7 +417,7 @@ var Jooks = /** @class */ (function () {
         this.refStore.start();
         this.memoStore.start();
         this.reducerStore.start();
-        return this.hookFunction();
+        return this.hookFunction.apply(this, args);
     };
     Jooks.prototype.fireEffects = function () {
         var _this = this;
