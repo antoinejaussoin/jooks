@@ -26,9 +26,7 @@ interface ReducerItem {
   currentState: any;
 }
 
-type HookFunction<T> = (...args: any[]) => T;
-
-export class Jooks<R> {
+export class Jooks<F extends Function> {
   private stateStore: HookStore<any>;
   private effectStore: HookStore<EffectItem>;
   private layoutEffectStore: HookStore<EffectItem>;
@@ -40,7 +38,7 @@ export class Jooks<R> {
   private reducerStore: HookStore<ReducerItem>;
   private cleanupFunctions: Function[];
 
-  constructor(private hookFunction: HookFunction<R>, private verbose: boolean = false) {
+  constructor(private hookFunction: F, private verbose: boolean = false) {
     this.stateStore = new HookStore('useState');
     this.effectStore = new HookStore('useEffect');
     this.layoutEffectStore = new HookStore('useLayoutEffect');
@@ -100,11 +98,10 @@ export class Jooks<R> {
    * If they are taking longer, you can increase the wait time to a given time in millisecond.
    * @param wait wait time in millisecond. Defaults to 1.
    */
-  public async mount(wait: number = 1): Promise<R> {
+  public async mount(wait: number = 1): Promise<void> {
     this.render();
     this.fireEffects();
     await this.wait(wait);
-    return this.render();
   }
 
   public async unmount(wait: number = 1) {
@@ -115,9 +112,11 @@ export class Jooks<R> {
   /**
    * Executes your hook, and returns the result
    */
-  public run(...args: any[]) {
+  public run = (((...args: any[]) => {
+    // This weird TypeScript hack ensures that the "run" function has the
+    // exact same signature as your hook.
     return this.render(...args);
-  }
+  }) as unknown) as F;
 
   /**
    * Use this to wait for Effects to be executed. Remember to mock all your API calls so that the asyncronous
@@ -379,7 +378,7 @@ export class Jooks<R> {
     return contextValue;
   }
 
-  private render(...args: any[]): R {
+  private render(...args: any[]): any {
     this.stateStore.start();
     this.effectStore.start();
     this.layoutEffectStore.start();
@@ -444,7 +443,7 @@ export class Jooks<R> {
   }
 }
 
-export function init<T>(hook: HookFunction<T>, verbose?: boolean) {
+export function init<F extends Function>(hook: F, verbose?: boolean) {
   const mock = new Jooks(hook, verbose);
   beforeEach(() => mock.setup());
   afterEach(() => mock.cleanup());

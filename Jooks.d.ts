@@ -1,7 +1,6 @@
 import React from 'react';
 import 'jest';
-declare type HookFunction<T> = (...args: any[]) => T;
-export declare class Jooks<R> {
+export declare class Jooks<F extends Function> {
     private hookFunction;
     private verbose;
     private stateStore;
@@ -14,7 +13,7 @@ export declare class Jooks<R> {
     private memoStore;
     private reducerStore;
     private cleanupFunctions;
-    constructor(hookFunction: HookFunction<R>, verbose?: boolean);
+    constructor(hookFunction: F, verbose?: boolean);
     /**
      * This should be run before each test.
      * This is automatically called by the init function exposed by the library.
@@ -33,12 +32,12 @@ export declare class Jooks<R> {
      * If they are taking longer, you can increase the wait time to a given time in millisecond.
      * @param wait wait time in millisecond. Defaults to 1.
      */
-    mount(wait?: number): Promise<R>;
+    mount(wait?: number): Promise<void>;
     unmount(wait?: number): Promise<void>;
     /**
      * Executes your hook, and returns the result
      */
-    run(...args: any[]): R;
+    run: F;
     /**
      * Use this to wait for Effects to be executed. Remember to mock all your API calls so that the asyncronous
      * effects are not taking more than 1 event-loop to execute, or more than 1ms.
@@ -69,5 +68,5 @@ export declare class Jooks<R> {
     private fireEffects;
     private fireEffectsCleanup;
 }
-export declare function init<T>(hook: HookFunction<T>, verbose?: boolean): Jooks<T>;
+export declare function init<F extends Function>(hook: F, verbose?: boolean): Jooks<F>;
 export default init;
