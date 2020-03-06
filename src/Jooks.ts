@@ -38,6 +38,8 @@ export class Jooks<F extends Function> {
   private reducerStore: HookStore<ReducerItem>;
   private cleanupFunctions: Function[];
 
+  private _renderArgs: any[];
+
   constructor(private hookFunction: F, private verbose: boolean = false) {
     this.stateStore = new HookStore('useState');
     this.effectStore = new HookStore('useEffect');
@@ -69,6 +71,7 @@ export class Jooks<F extends Function> {
     this.refStore.setup(this.mockUseRef.bind(this));
     this.memoStore.setup(this.mockUseMemo.bind(this));
     this.reducerStore.setup(this.mockUseReducer.bind(this));
+    this._renderArgs = [];
   }
 
   /**
@@ -99,7 +102,7 @@ export class Jooks<F extends Function> {
    * @param wait wait time in millisecond. Defaults to 1.
    */
   public async mount(wait: number = 1): Promise<void> {
-    this.render();
+    this.render(...this._renderArgs);
     this.fireEffects();
     await this.wait(wait);
   }
@@ -115,6 +118,7 @@ export class Jooks<F extends Function> {
   public run = (((...args: any[]) => {
     // This weird TypeScript hack ensures that the "run" function has the
     // exact same signature as your hook.
+    this._renderArgs = [...args]
     return this.render(...args);
   }) as unknown) as F;
 
@@ -392,7 +396,7 @@ export class Jooks<F extends Function> {
   }
 
   private fireEffects() {
-    this.render();
+    this.render(...this._renderArgs);
     if (this.verbose) {
       console.log('Looking for effects to fire', this.effectStore.store, this.layoutEffectStore.store);
     }
@@ -409,7 +413,7 @@ export class Jooks<F extends Function> {
           }
         }
         effect.hasRun = true;
-        this.render();
+        this.render(...this._renderArgs);
       }
     });
     this.layoutEffectStore.store.forEach((effect) => {
@@ -425,7 +429,7 @@ export class Jooks<F extends Function> {
           }
         }
         effect.hasRun = true;
-        this.render();
+        this.render(...this._renderArgs);
       }
     });
   }

@@ -68,6 +68,7 @@ var Jooks = /** @class */ (function () {
             }
             // This weird TypeScript hack ensures that the "run" function has the
             // exact same signature as your hook.
+            _this._renderArgs = args.slice();
             return _this.render.apply(_this, args);
         });
         this.stateStore = new HookStore('useState');
@@ -131,7 +132,7 @@ var Jooks = /** @class */ (function () {
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        this.render();
+                        this.render.apply(this, this._renderArgs);
                         this.fireEffects();
                         return [4 /*yield*/, this.wait(wait)];
                     case 1:
@@ -421,7 +422,7 @@ var Jooks = /** @class */ (function () {
     };
     Jooks.prototype.fireEffects = function () {
         var _this = this;
-        this.render();
+        this.render.apply(this, this._renderArgs);
         if (this.verbose) {
             console.log('Looking for effects to fire', this.effectStore.store, this.layoutEffectStore.store);
         }
@@ -438,7 +439,7 @@ var Jooks = /** @class */ (function () {
                     }
                 }
                 effect.hasRun = true;
-                _this.render();
+                _this.render.apply(_this, _this._renderArgs);
             }
         });
         this.layoutEffectStore.store.forEach(function (effect) {
@@ -454,7 +455,7 @@ var Jooks = /** @class */ (function () {
                     }
                 }
                 effect.hasRun = true;
-                _this.render();
+                _this.render.apply(_this, _this._renderArgs);
             }
         });
     };
