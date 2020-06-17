@@ -261,7 +261,16 @@ var Jooks = /** @class */ (function () {
     Jooks.prototype.mockUseState = function (defaultValue) {
         var _this = this;
         var localPointer = this.stateStore.pointer;
+        var isFunction = function (arg) { return typeof arg === 'function'; };
         var setState = function (v) {
+            if (isFunction(v)) {
+                var newState = v(_this.stateStore.store[localPointer]);
+                if (_this.verbose) {
+                    console.log('Set state to ', newState, ' pointer ', localPointer);
+                }
+                _this.stateStore.store[localPointer] = newState;
+                return;
+            }
             if (_this.verbose) {
                 console.log('Set state to ', v, ' pointer ', localPointer);
             }

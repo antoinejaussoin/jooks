@@ -17,18 +17,20 @@ describe('Testing useState hook', () => {
 
   it('It should update the values properly', () => {
     // Run your Hook function
-    let { first, second, third, update } = jooks.run();
+    let { first, second, third, fourth, update } = jooks.run();
     expect(first).toBe('alpha');
     expect(second).toBe('beta');
     expect(third).toBe('charlie');
+    expect(fourth).toStrictEqual([1, 2]);
 
     // Call the callback
     update();
 
     // Run the Hook again to get the new values
-    ({ first, second, third } = jooks.run());
+    ({ first, second, third, fourth } = jooks.run());
     expect(first).toBe('alphaa');
     expect(second).toBe('betab');
     expect(third).toBe('charliec');
+    expect(fourth).toStrictEqual([1, 2, 3]);
   });
 });

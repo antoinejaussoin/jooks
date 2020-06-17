@@ -231,14 +231,25 @@ export class Jooks<F extends Function> {
 
   private mockUseState<T>(defaultValue: T | (() => T)) {
     const localPointer = this.stateStore.pointer;
-    const setState = (v: T) => {
+
+    const isFunction = (arg: any): arg is Function => typeof arg === 'function';
+
+    const setState = (v: T | ((previousValue: T) => void)) => {
+      if (isFunction(v)) {
+        const newState = v(this.stateStore.store[localPointer]);
+        if (this.verbose) {
+          console.log('Set state to ', newState, ' pointer ', localPointer);
+        }
+        this.stateStore.store[localPointer] = newState;
+        return;
+      }
       if (this.verbose) {
         console.log('Set state to ', v, ' pointer ', localPointer);
       }
       this.stateStore.store[localPointer] = v;
     };
     if (this.stateStore.current === undefined) {
-      const computedDefault = typeof defaultValue === 'function' ? (defaultValue as (() => T))() : defaultValue;
+      const computedDefault = typeof defaultValue === 'function' ? (defaultValue as () => T)() : defaultValue;
       if (this.verbose) {
         console.log('Set default to ', computedDefault, ' pointer ', localPointer);
       }
