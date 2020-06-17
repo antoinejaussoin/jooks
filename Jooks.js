@@ -11,10 +11,11 @@ var __assign = (this && this.__assign) || function () {
     return __assign.apply(this, arguments);
 };
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
         function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
@@ -45,10 +46,18 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
+var __spreadArrays = (this && this.__spreadArrays) || function () {
+    for (var s = 0, i = 0, il = arguments.length; i < il; i++) s += arguments[i].length;
+    for (var r = Array(s), k = 0, i = 0; i < il; i++)
+        for (var a = arguments[i], j = 0, jl = a.length; j < jl; j++, k++)
+            r[k] = a[j];
+    return r;
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.init = exports.Jooks = void 0;
 var react_1 = __importDefault(require("react"));
 var lodash_1 = require("lodash");
 require("jest");
@@ -68,7 +77,7 @@ var Jooks = /** @class */ (function () {
             }
             // This weird TypeScript hack ensures that the "run" function has the
             // exact same signature as your hook.
-            _this._renderArgs = args.slice();
+            _this._renderArgs = __spreadArrays(args);
             return _this.render.apply(_this, args);
         });
         this.stateStore = new HookStore('useState');
@@ -100,6 +109,7 @@ var Jooks = /** @class */ (function () {
         this.refStore.setup(this.mockUseRef.bind(this));
         this.memoStore.setup(this.mockUseMemo.bind(this));
         this.reducerStore.setup(this.mockUseReducer.bind(this));
+        this._renderArgs = [];
     };
     /**
      * This should be run after each test.
@@ -214,7 +224,7 @@ var Jooks = /** @class */ (function () {
             if (this.verbose) {
                 console.log('Existing reducer: ', this.reducerStore.current.currentState);
             }
-            this.reducerStore.current = __assign({}, this.reducerStore.current, { initialState: initialState,
+            this.reducerStore.current = __assign(__assign({}, this.reducerStore.current), { initialState: initialState,
                 reducer: reducer });
         }
         var current = this.reducerStore.current;
@@ -513,7 +523,7 @@ var HookStore = /** @class */ (function () {
         get: function () {
             return this._pointer;
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     Object.defineProperty(HookStore.prototype, "current", {
@@ -523,14 +533,14 @@ var HookStore = /** @class */ (function () {
         set: function (value) {
             this._store[this._pointer] = value;
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     Object.defineProperty(HookStore.prototype, "store", {
         get: function () {
             return this._store;
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     HookStore.prototype.next = function () {

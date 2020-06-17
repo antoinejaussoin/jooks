@@ -13,6 +13,7 @@ export declare class Jooks<F extends Function> {
     private memoStore;
     private reducerStore;
     private cleanupFunctions;
+    private _renderArgs;
     constructor(hookFunction: F, verbose?: boolean);
     /**
      * This should be run before each test.
