@@ -30,7 +30,7 @@ That way you can **test your hooks in isolation**, and you don't need the overhe
 
 ## Prerequisites
 
-This library only works with Jest for the moment. Support for other test frameworks is planned.
+This library works with Jest.
 
 ## Current capabilities
 
@@ -58,7 +58,7 @@ Currently, the library supports most of React's basic hooks:
 Let's take this very simple hook:
 
 ```javascript
-const useSimpleState = () => {
+const useStateOnlyExample = () => {
   const [first, setFirst] = useState('alpha');
   const [second, setSecond] = useState('beta');
   const [third, setThird] = useState(() => 'charlie'); // Notice the delayed execution
@@ -135,15 +135,14 @@ interface Activity {
 export default () => {
   const [activity, setActivity] = useState<Activity | null>(null);
 
-  const fetchData = async () => {
-    const result = await fetch("https://www.boredapi.com/api/activity");
-    if (result.ok) {
-      const content = (await result.json()) as Activity;
-      setActivity(content);
-    }
-  };
-
   useEffect(() => {
+    const fetchData = async () => {
+      const result = await fetch("https://www.boredapi.com/api/activity");
+      if (result.ok) {
+        const content = (await result.json()) as Activity;
+        setActivity(content);
+      }
+    };
     fetchData();
   }, []);
 
@@ -411,6 +410,8 @@ This is only necessary when your Hook uses `useContext`. You need to call this a
 ## Thanks
 
 - Thanks to [@bronter](https://github.com/bronter) for suggesting and implementing the ability to specify a hook function parameters on `run()` instead of just during initialisation.
+- Thanks to [@jjd314](https://github.com/jjd314) for [implementing a fix](https://github.com/antoinejaussoin/jooks/pull/6) around saving run() arguments
+- Thanks to [@hjvvoorthuijsen](https://github.com/hjvvoorthuijsen) for improving the `setState` mock and [allowing the use of a callback function](https://github.com/antoinejaussoin/jooks/pull/9).
 
 ## Can I contribute?
 
