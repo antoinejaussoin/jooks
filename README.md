@@ -58,7 +58,9 @@ Currently, the library supports most of React's basic hooks:
 Let's take this very simple hook:
 
 ```javascript
-const useStateOnlyExample = () => {
+import { useState } from 'react';
+
+export default function useStateExample() {
   const [first, setFirst] = useState('alpha');
   const [second, setSecond] = useState('beta');
   const [third, setThird] = useState(() => 'charlie'); // Notice the delayed execution
@@ -68,7 +70,8 @@ const useStateOnlyExample = () => {
     setThird(third + 'c');
   };
   return { first, second, third, update };
-};
+}
+
 ```
 
 To test this (mostly useless) CRH, here is what you need to do:
@@ -121,7 +124,7 @@ It also provides a callback to fetch another set of data.
 The example is using TypeScript, but this would of course work with vanilla JavaScript.
 
 ```javascript
-import { useEffect, useState } from "react";
+import { useEffect, useState } from 'react';
 
 interface Activity {
   activity: string;
@@ -132,22 +135,23 @@ interface Activity {
   key: string;
 }
 
-export default () => {
+export default function useLoadActivity() {
   const [activity, setActivity] = useState<Activity | null>(null);
 
+  const fetchData = async () => {
+    const result = await fetch('https://www.boredapi.com/api/activity');
+    if (result.ok) {
+      const content = (await result.json()) as Activity;
+      setActivity(content);
+    }
+  };
+
   useEffect(() => {
-    const fetchData = async () => {
-      const result = await fetch("https://www.boredapi.com/api/activity");
-      if (result.ok) {
-        const content = (await result.json()) as Activity;
-        setActivity(content);
-      }
-    };
     fetchData();
   }, []);
 
   return { activity, next: fetchData };
-};
+}
 ```
 
 The problem with that example, is that it would be impossible to test with other techniques, because of the asynchronous content of the `useEffect` function.
@@ -212,13 +216,11 @@ Let's see an example:
 import { useContext } from 'react';
 import { Context1, Context2 } from './ExampleContext';
 
-const useContextExample = () => {
+export default function useContextExample() {
   const { foo } = useContext(Context1);
   const { ping } = useContext(Context2);
   return foo + ':' + ping;
-};
-
-export default useContextExample;
+}
 ```
 
 And the test:
@@ -265,12 +267,10 @@ Hooks often rely on passed-in arguments to compute a value, for example:
 import { useContext } from 'react';
 import { Context1 } from './ExampleContext';
 
-const useContextWithArgsExample = bar => {
+export default function useContextWithArgsExample(bar: string) {
   const { foo } = useContext(Context1);
   return foo + ':' + bar;
-};
-
-export default useContextWithArgsExample;
+}
 ```
 
 To test these, we can simply pass in the argument when we call `.run()`:
@@ -402,6 +402,12 @@ This is only necessary when your Hook uses `useContext`. You need to call this a
 - Allowing a better control on the Hook's internal state
 
 ## Change Log
+
+### Version 2.0.0
+
+- **Breaking change**: context values don't have to be set in a specific order anymore. They don't have to be set multiple times either.
+- Remove dependency to `lodash`. Only `lodash.isequal` is now a dependency.
+- Fixed some mistakes in the examples.
 
 ### Version 1.2.0
 

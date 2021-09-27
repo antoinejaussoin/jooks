@@ -5,3 +5,4 @@ yarn-error.log
 tsconfig.json
 tsconfig.build.json
 yarn.lock
+.prettierrc

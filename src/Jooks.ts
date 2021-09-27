@@ -1,6 +1,5 @@
 import React from 'react';
-import { isEqual, isFunction } from 'lodash';
-import 'jest';
+import isEqual from 'lodash.isequal';
 
 /* tslint:disable */
 
@@ -27,29 +26,33 @@ interface ReducerItem {
 }
 
 export class Jooks<F extends Function> {
+  private contextValues: Map<React.Context<any>, any>;
+
   private stateStore: HookStore<any>;
   private effectStore: HookStore<EffectItem>;
   private layoutEffectStore: HookStore<EffectItem>;
   private callbackStore: HookStore<CallbackItem>;
-  private contextStore: HookStore<any>;
   private debugStore: HookStore<void>;
   private refStore: HookStore<any>;
   private memoStore: HookStore<MemoItem>;
   private reducerStore: HookStore<ReducerItem>;
+  private contextStore: HookStoreBase;
   private cleanupFunctions: Function[];
 
   private _renderArgs: any[];
 
   constructor(private hookFunction: F, private verbose: boolean = false) {
+    this.contextValues = new Map<React.Context<any>, any>();
+
     this.stateStore = new HookStore('useState');
     this.effectStore = new HookStore('useEffect');
     this.layoutEffectStore = new HookStore('useLayoutEffect');
     this.callbackStore = new HookStore('useCallback');
-    this.contextStore = new HookStore('useContext');
     this.debugStore = new HookStore('useDebugValue');
     this.refStore = new HookStore('useRef');
     this.memoStore = new HookStore('useMemo');
     this.reducerStore = new HookStore('useReducer');
+    this.contextStore = new HookStoreBase('useContext');
     this.cleanupFunctions = [];
     this._renderArgs = [];
   }
@@ -63,15 +66,16 @@ export class Jooks<F extends Function> {
     if (this.verbose) {
       console.log('Setup Mock');
     }
+
     this.stateStore.setup(this.mockUseState.bind(this));
     this.effectStore.setup(this.mockUseEffect.bind(this));
     this.layoutEffectStore.setup(this.mockUseLayoutEffect.bind(this));
     this.callbackStore.setup(this.mockUseCallback.bind(this));
-    this.contextStore.setup(this.mockUseContext.bind(this));
     this.debugStore.setup(this.mockUseDebugValue.bind(this));
     this.refStore.setup(this.mockUseRef.bind(this));
     this.memoStore.setup(this.mockUseMemo.bind(this));
     this.reducerStore.setup(this.mockUseReducer.bind(this));
+    this.contextStore.setup(this.mockUseContext.bind(this));
     this._renderArgs = [];
   }
 
@@ -89,11 +93,11 @@ export class Jooks<F extends Function> {
     this.effectStore.restore();
     this.layoutEffectStore.restore();
     this.callbackStore.restore();
-    this.contextStore.restore();
     this.debugStore.restore();
     this.refStore.restore();
     this.memoStore.restore();
     this.reducerStore.restore();
+    this.contextStore.restore();
   }
 
   /**
@@ -141,16 +145,16 @@ export class Jooks<F extends Function> {
    */
   public setContext<T>(context: React.Context<T>, value: T) {
     if (this.verbose) {
-      console.log('Setting context', this.contextStore.store.length, 'to', value);
+      console.log('Setting context', context.displayName, 'to', value);
     }
-    this.contextStore.store.push(value);
+    this.contextValues.set(context, value);
   }
 
   /**
    * Reset all Context values. Don't forget to call setContext again after that.
    */
   public resetContext() {
-    this.contextStore.reset();
+    this.contextValues.clear();
   }
 
   private mockUseDebugValue<T>(value: T, formatter?: (value: T) => any) {
@@ -383,14 +387,13 @@ export class Jooks<F extends Function> {
   }
 
   private mockUseContext<T>(context: React.Context<T>): T | null {
-    if (this.contextStore.store.length < this.contextStore.pointer + 1) {
-      throw Error(`You forgot to set the context for the call number ${this.contextStore.pointer + 1} to useContext`);
+    if (!this.contextValues.has(context)) {
+      throw Error(`You forgot to set the context for context ${context.displayName} to useContext`);
     }
-    const contextValue = this.contextStore.current;
+    const contextValue = this.contextValues.get(context);
     if (this.verbose) {
-      console.log('Getting value from context', this.contextStore.pointer, ':', contextValue);
+      console.log('Getting value from context', context.displayName, ':', contextValue);
     }
-    this.contextStore.next();
     return contextValue;
   }
 
@@ -399,7 +402,6 @@ export class Jooks<F extends Function> {
     this.effectStore.start();
     this.layoutEffectStore.start();
     this.callbackStore.start();
-    this.contextStore.start();
     this.debugStore.start();
     this.refStore.start();
     this.memoStore.start();
@@ -468,16 +470,31 @@ export function init<F extends Function>(hook: F, verbose?: boolean) {
 
 export default init;
 
-class HookStore<T> {
-  private _pointer: number;
-  private _store: T[];
-  private _original: any;
-  private _property: string;
+class HookStoreBase {
+  protected _original: any;
+  protected _property: string;
+
   constructor(property: string) {
-    this._pointer = 0;
-    this._store = [];
     this._property = property;
     this._original = (React as any)[property];
+  }
+
+  public setup(mockFunction: Function) {
+    (React as any)[this._property] = mockFunction;
+  }
+
+  public restore() {
+    (React as any)[this._property] = this._original;
+  }
+}
+
+class HookStore<T> extends HookStoreBase {
+  private _pointer: number;
+  private _store: T[];
+  constructor(property: string) {
+    super(property);
+    this._pointer = 0;
+    this._store = [];
   }
 
   public reset() {
@@ -487,7 +504,7 @@ class HookStore<T> {
 
   public setup(mockFunction: Function) {
     this.reset();
-    (React as any)[this._property] = mockFunction;
+    super.setup(mockFunction);
   }
 
   public start() {
@@ -513,8 +530,8 @@ class HookStore<T> {
   public next() {
     this._pointer += 1;
   }
+}
 
-  public restore() {
-    (React as any)[this._property] = this._original;
-  }
+function isFunction(value: unknown) {
+  return typeof value === 'function';
 }
