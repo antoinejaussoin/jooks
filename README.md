@@ -406,6 +406,8 @@ This is only necessary when your Hook uses `useContext`. You need to call this a
 ### Version 2.0.0
 
 - **Breaking change**: context values don't have to be set in a specific order anymore. They don't have to be set multiple times either.
+- Remove dependency to `lodash`. Only `lodash.isequal` is now a dependency.
+- Fixed some mistakes in the examples.
 
 ### Version 1.2.0
 
