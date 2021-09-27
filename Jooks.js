@@ -92,6 +92,7 @@ var Jooks = /** @class */ (function () {
         this.memoStore = new HookStore('useMemo');
         this.reducerStore = new HookStore('useReducer');
         this.cleanupFunctions = [];
+        this._renderArgs = [];
     }
     /**
      * This should be run before each test.
