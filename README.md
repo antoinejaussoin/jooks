@@ -403,9 +403,9 @@ This is only necessary when your Hook uses `useContext`. You need to call this a
 
 ## Change Log
 
-### Version 1.2.1
+### Version 2.0.0
 
-- Fix some of the examples
+- **Breaking change**: context values don't have to be set in a specific order anymore. They don't have to be set multiple times either.
 
 ### Version 1.2.0
 
