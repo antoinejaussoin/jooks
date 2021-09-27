@@ -38,7 +38,7 @@ const init = (state: State) => ({
   name: state.name + ' Dylan',
 });
 
-const useReducerExample = () => {
+export default function useReducerExample() {
   const [state, dispatch] = useReducer(reducer, initialState, init);
   const rename = (name: string) =>
     dispatch({
@@ -50,6 +50,4 @@ const useReducerExample = () => {
       type: 'age',
     });
   return { user: state, rename, increaseAge };
-};
-
-export default useReducerExample;
+}

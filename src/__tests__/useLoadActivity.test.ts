@@ -1,14 +1,12 @@
+import { GlobalWithFetchMock } from 'jest-fetch-mock';
 import 'jest';
 import init from '../Jooks'; // In your code, do: import init from 'jooks';
 import useLoadActivity from '../useLoadActivity';
 // This library helps you with testing fetch, but you can use other methods to achieve the same thing
-import { GlobalWithFetchMock } from 'jest-fetch-mock';
 
 // This is a TypeScript specific way of mocking the fetch function.
 // See the jest-fetch-mock documentation for more information.
-const customGlobal: GlobalWithFetchMock = global as GlobalWithFetchMock;
-customGlobal.fetch = require('jest-fetch-mock');
-customGlobal.fetchMock = customGlobal.fetch;
+const customGlobal: GlobalWithFetchMock = global as unknown as GlobalWithFetchMock;
 
 describe('Testing a custom hook', () => {
   const jooks = init(() => useLoadActivity());

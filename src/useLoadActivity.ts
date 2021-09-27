@@ -9,7 +9,7 @@ interface Activity {
   key: string;
 }
 
-export default () => {
+export default function useLoadActivity() {
   const [activity, setActivity] = useState<Activity | null>(null);
 
   const fetchData = async () => {
@@ -27,4 +27,4 @@ export default () => {
   useDebugValue(activity, (activity) => (activity ? activity.activity : 'not loaded'));
 
   return { activity, next: fetchData };
-};
+}

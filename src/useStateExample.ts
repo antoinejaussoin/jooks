@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-export default () => {
+export default function useStateExample() {
   const [first, setFirst] = useState('alpha');
   const [second, setSecond] = useState('beta');
   const [third, setThird] = useState(() => 'charlie');
@@ -12,4 +12,4 @@ export default () => {
     setFourth((previousState) => [...previousState, 3]);
   };
   return { first, second, third, fourth, update };
-};
+}

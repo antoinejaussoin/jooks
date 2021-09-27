@@ -401,6 +401,13 @@ This is only necessary when your Hook uses `useContext`. You need to call this a
 - Making Jooks compatible with other testing frameworks
 - Allowing a better control on the Hook's internal state
 
+## Change Log
+
+### Version 1.2.0
+
+- Updating dependencies
+- Adding link to GitHub Repository (courtesy of Microsoft)
+
 ## FAQ
 
 - Why Jooks? it's a mix of Jest and Hooks.

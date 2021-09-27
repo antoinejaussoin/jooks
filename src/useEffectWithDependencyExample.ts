@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-export default () => {
+export default function useEffectWithDependencyExample() {
   const [result, setResult] = useState('');
   const [someOtherDependency, setSomeOtherDependency] = useState(0);
   useEffect(() => {
@@ -13,4 +13,4 @@ export default () => {
   }, [someOtherDependency]);
 
   return { result, setSomeOtherDependency };
-};
+}
