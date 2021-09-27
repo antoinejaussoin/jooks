@@ -1,6 +1,6 @@
 import { useLayoutEffect, useState } from 'react';
 
-export default () => {
+export default function useLayoutEffectWithDependencyExample() {
   const [result, setResult] = useState('');
   const [someOtherDependency, setSomeOtherDependency] = useState(0);
   useLayoutEffect(() => {
@@ -13,4 +13,4 @@ export default () => {
   }, [someOtherDependency]);
 
   return { result, setSomeOtherDependency };
-};
+}

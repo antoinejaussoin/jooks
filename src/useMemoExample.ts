@@ -5,12 +5,10 @@ interface Flags {
   beta: number;
 }
 
-const useMemoExample = (spy: () => number, flags: Flags) => {
+export default function useMemoExample(spy: () => number, flags: Flags) {
   const memo = useMemo(() => {
     spy();
     return flags.alpha + flags.beta;
   }, [flags.alpha, flags.beta]);
   return memo;
-};
-
-export default useMemoExample;
+}

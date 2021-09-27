@@ -46,12 +46,14 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-var __spreadArrays = (this && this.__spreadArrays) || function () {
-    for (var s = 0, i = 0, il = arguments.length; i < il; i++) s += arguments[i].length;
-    for (var r = Array(s), k = 0, i = 0; i < il; i++)
-        for (var a = arguments[i], j = 0, jl = a.length; j < jl; j++, k++)
-            r[k] = a[j];
-    return r;
+var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
+    if (pack || arguments.length === 2) for (var i = 0, l = from.length, ar; i < l; i++) {
+        if (ar || !(i in from)) {
+            if (!ar) ar = Array.prototype.slice.call(from, 0, i);
+            ar[i] = from[i];
+        }
+    }
+    return to.concat(ar || Array.prototype.slice.call(from));
 };
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
@@ -77,7 +79,7 @@ var Jooks = /** @class */ (function () {
             }
             // This weird TypeScript hack ensures that the "run" function has the
             // exact same signature as your hook.
-            _this._renderArgs = __spreadArrays(args);
+            _this._renderArgs = __spreadArray([], args, true);
             return _this.render.apply(_this, args);
         });
         this.stateStore = new HookStore('useState');
@@ -224,8 +226,7 @@ var Jooks = /** @class */ (function () {
             if (this.verbose) {
                 console.log('Existing reducer: ', this.reducerStore.current.currentState);
             }
-            this.reducerStore.current = __assign(__assign({}, this.reducerStore.current), { initialState: initialState,
-                reducer: reducer });
+            this.reducerStore.current = __assign(__assign({}, this.reducerStore.current), { initialState: initialState, reducer: reducer });
         }
         var current = this.reducerStore.current;
         var dispatch = function (action) {
@@ -246,7 +247,7 @@ var Jooks = /** @class */ (function () {
             if (this.verbose) {
                 console.log('A callback already exists at this pointer ', this.callbackStore.pointer);
             }
-            var areDepsEqual = lodash_1.isEqual(deps, existingCallback.deps);
+            var areDepsEqual = (0, lodash_1.isEqual)(deps, existingCallback.deps);
             if (this.verbose) {
                 console.log('Did the CB dependencies change?', areDepsEqual, deps, existingCallback.deps);
             }
@@ -303,7 +304,7 @@ var Jooks = /** @class */ (function () {
             if (this.verbose) {
                 console.log('An effect already exists at this pointer ', this.effectStore.pointer);
             }
-            var areDepsEqual = lodash_1.isEqual(deps, existingEffect.deps);
+            var areDepsEqual = (0, lodash_1.isEqual)(deps, existingEffect.deps);
             if (this.verbose) {
                 console.log('Did the dependencies change?', areDepsEqual, deps, existingEffect.deps);
             }
@@ -334,7 +335,7 @@ var Jooks = /** @class */ (function () {
             if (this.verbose) {
                 console.log('A layout effect already exists at this pointer ', this.layoutEffectStore.pointer);
             }
-            var areDepsEqual = lodash_1.isEqual(deps, existingEffect.deps);
+            var areDepsEqual = (0, lodash_1.isEqual)(deps, existingEffect.deps);
             if (this.verbose) {
                 console.log('Did the dependencies change?', areDepsEqual, deps, existingEffect.deps);
             }
@@ -384,7 +385,7 @@ var Jooks = /** @class */ (function () {
             if (this.verbose) {
                 console.log('A memo already exists at this pointer ', this.memoStore.pointer);
             }
-            var areDepsEqual = lodash_1.isEqual(deps, existingMemo.deps);
+            var areDepsEqual = (0, lodash_1.isEqual)(deps, existingMemo.deps);
             if (this.verbose) {
                 console.log('Did the dependencies change?', areDepsEqual, deps, existingMemo.deps);
             }
@@ -451,7 +452,7 @@ var Jooks = /** @class */ (function () {
                     console.log('Firing effect: ', effect);
                 }
                 var cleanup = effect.effect();
-                if (lodash_1.isFunction(cleanup)) {
+                if ((0, lodash_1.isFunction)(cleanup)) {
                     _this.cleanupFunctions[_this.effectStore.pointer] = cleanup;
                     if (_this.verbose) {
                         console.log('Storing cleanup function for ', _this.cleanupFunctions.length);
@@ -467,7 +468,7 @@ var Jooks = /** @class */ (function () {
                     console.log('Firing layout effect: ', effect);
                 }
                 var cleanup = effect.effect();
-                if (lodash_1.isFunction(cleanup)) {
+                if ((0, lodash_1.isFunction)(cleanup)) {
                     _this.cleanupFunctions[_this.effectStore.pointer + 10000] = cleanup;
                     if (_this.verbose) {
                         console.log('Storing cleanup function for ', effect);

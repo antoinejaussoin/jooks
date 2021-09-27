@@ -5,7 +5,7 @@ interface Subscription {
   disconnect: () => void;
 }
 
-export default (subscription: Subscription) => {
+export default function useEffectWithCleanup(subscription: Subscription) {
   useEffect(() => {
     subscription.connect();
     return () => {
@@ -14,4 +14,4 @@ export default (subscription: Subscription) => {
   }, [subscription]);
 
   return 'foo';
-};
+}

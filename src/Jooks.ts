@@ -51,6 +51,7 @@ export class Jooks<F extends Function> {
     this.memoStore = new HookStore('useMemo');
     this.reducerStore = new HookStore('useReducer');
     this.cleanupFunctions = [];
+    this._renderArgs = [];
   }
 
   /**
@@ -115,12 +116,12 @@ export class Jooks<F extends Function> {
   /**
    * Executes your hook, and returns the result
    */
-  public run = (((...args: any[]) => {
+  public run = ((...args: any[]) => {
     // This weird TypeScript hack ensures that the "run" function has the
     // exact same signature as your hook.
-    this._renderArgs = [...args]
+    this._renderArgs = [...args];
     return this.render(...args);
-  }) as unknown) as F;
+  }) as unknown as F;
 
   /**
    * Use this to wait for Effects to be executed. Remember to mock all your API calls so that the asyncronous

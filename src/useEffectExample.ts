@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-export default () => {
+export default function useEffectExample() {
   const [result, setResult] = useState('');
   useEffect(() => {
     const fetchResult = async () => {
@@ -12,4 +12,4 @@ export default () => {
   }, []);
 
   return result;
-};
+}
