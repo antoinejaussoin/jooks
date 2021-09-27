@@ -2,8 +2,7 @@ import './App.css';
 import useLoadActivity from './useLoadActivity';
 
 // This is an example of a hook that works in real-life
-
-const App = () => {
+export default function App() {
   const { activity, next } = useLoadActivity();
   if (activity) {
     return (
@@ -20,6 +19,4 @@ const App = () => {
     );
   }
   return <div>Loading...</div>;
-};
-
-export default App;
+}

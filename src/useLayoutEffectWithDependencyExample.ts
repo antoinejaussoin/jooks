@@ -4,12 +4,9 @@ export default function useLayoutEffectWithDependencyExample() {
   const [result, setResult] = useState('');
   const [someOtherDependency, setSomeOtherDependency] = useState(0);
   useLayoutEffect(() => {
-    const fetchResult = async () => {
-      await setTimeout(() => {
-        setResult(result + 'x');
-      });
-    };
-    fetchResult();
+    setTimeout(() => {
+      setResult((prev) => prev + 'x');
+    });
   }, [someOtherDependency]);
 
   return { result, setSomeOtherDependency };
