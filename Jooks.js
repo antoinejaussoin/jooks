@@ -1,4 +1,19 @@
 "use strict";
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        if (typeof b !== "function" && b !== null)
+            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
 var __assign = (this && this.__assign) || function () {
     __assign = Object.assign || function(t) {
         for (var s, i = 1, n = arguments.length; i < n; i++) {
@@ -61,8 +76,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.init = exports.Jooks = void 0;
 var react_1 = __importDefault(require("react"));
-var lodash_1 = require("lodash");
-require("jest");
+var lodash_isequal_1 = __importDefault(require("lodash.isequal"));
 var Jooks = /** @class */ (function () {
     function Jooks(hookFunction, verbose) {
         var _this = this;
@@ -82,15 +96,16 @@ var Jooks = /** @class */ (function () {
             _this._renderArgs = __spreadArray([], args, true);
             return _this.render.apply(_this, args);
         });
+        this.contextValues = new Map();
         this.stateStore = new HookStore('useState');
         this.effectStore = new HookStore('useEffect');
         this.layoutEffectStore = new HookStore('useLayoutEffect');
         this.callbackStore = new HookStore('useCallback');
-        this.contextStore = new HookStore('useContext');
         this.debugStore = new HookStore('useDebugValue');
         this.refStore = new HookStore('useRef');
         this.memoStore = new HookStore('useMemo');
         this.reducerStore = new HookStore('useReducer');
+        this.contextStore = new HookStoreBase('useContext');
         this.cleanupFunctions = [];
         this._renderArgs = [];
     }
@@ -107,11 +122,11 @@ var Jooks = /** @class */ (function () {
         this.effectStore.setup(this.mockUseEffect.bind(this));
         this.layoutEffectStore.setup(this.mockUseLayoutEffect.bind(this));
         this.callbackStore.setup(this.mockUseCallback.bind(this));
-        this.contextStore.setup(this.mockUseContext.bind(this));
         this.debugStore.setup(this.mockUseDebugValue.bind(this));
         this.refStore.setup(this.mockUseRef.bind(this));
         this.memoStore.setup(this.mockUseMemo.bind(this));
         this.reducerStore.setup(this.mockUseReducer.bind(this));
+        this.contextStore.setup(this.mockUseContext.bind(this));
         this._renderArgs = [];
     };
     /**
@@ -127,11 +142,11 @@ var Jooks = /** @class */ (function () {
         this.effectStore.restore();
         this.layoutEffectStore.restore();
         this.callbackStore.restore();
-        this.contextStore.restore();
         this.debugStore.restore();
         this.refStore.restore();
         this.memoStore.restore();
         this.reducerStore.restore();
+        this.contextStore.restore();
     };
     /**
      * Use this to simulate a component "mounting", which means calling all its useEffect on componentDidMount.
@@ -192,15 +207,15 @@ var Jooks = /** @class */ (function () {
      */
     Jooks.prototype.setContext = function (context, value) {
         if (this.verbose) {
-            console.log('Setting context', this.contextStore.store.length, 'to', value);
+            console.log('Setting context', context.displayName, 'to', value);
         }
-        this.contextStore.store.push(value);
+        this.contextValues.set(context, value);
     };
     /**
      * Reset all Context values. Don't forget to call setContext again after that.
      */
     Jooks.prototype.resetContext = function () {
-        this.contextStore.reset();
+        this.contextValues.clear();
     };
     Jooks.prototype.mockUseDebugValue = function (value, formatter) {
         if (this.verbose) {
@@ -248,7 +263,7 @@ var Jooks = /** @class */ (function () {
             if (this.verbose) {
                 console.log('A callback already exists at this pointer ', this.callbackStore.pointer);
             }
-            var areDepsEqual = (0, lodash_1.isEqual)(deps, existingCallback.deps);
+            var areDepsEqual = (0, lodash_isequal_1.default)(deps, existingCallback.deps);
             if (this.verbose) {
                 console.log('Did the CB dependencies change?', areDepsEqual, deps, existingCallback.deps);
             }
@@ -305,7 +320,7 @@ var Jooks = /** @class */ (function () {
             if (this.verbose) {
                 console.log('An effect already exists at this pointer ', this.effectStore.pointer);
             }
-            var areDepsEqual = (0, lodash_1.isEqual)(deps, existingEffect.deps);
+            var areDepsEqual = (0, lodash_isequal_1.default)(deps, existingEffect.deps);
             if (this.verbose) {
                 console.log('Did the dependencies change?', areDepsEqual, deps, existingEffect.deps);
             }
@@ -336,7 +351,7 @@ var Jooks = /** @class */ (function () {
             if (this.verbose) {
                 console.log('A layout effect already exists at this pointer ', this.layoutEffectStore.pointer);
             }
-            var areDepsEqual = (0, lodash_1.isEqual)(deps, existingEffect.deps);
+            var areDepsEqual = (0, lodash_isequal_1.default)(deps, existingEffect.deps);
             if (this.verbose) {
                 console.log('Did the dependencies change?', areDepsEqual, deps, existingEffect.deps);
             }
@@ -386,7 +401,7 @@ var Jooks = /** @class */ (function () {
             if (this.verbose) {
                 console.log('A memo already exists at this pointer ', this.memoStore.pointer);
             }
-            var areDepsEqual = (0, lodash_1.isEqual)(deps, existingMemo.deps);
+            var areDepsEqual = (0, lodash_isequal_1.default)(deps, existingMemo.deps);
             if (this.verbose) {
                 console.log('Did the dependencies change?', areDepsEqual, deps, existingMemo.deps);
             }
@@ -415,14 +430,13 @@ var Jooks = /** @class */ (function () {
         return value;
     };
     Jooks.prototype.mockUseContext = function (context) {
-        if (this.contextStore.store.length < this.contextStore.pointer + 1) {
-            throw Error("You forgot to set the context for the call number " + (this.contextStore.pointer + 1) + " to useContext");
+        if (!this.contextValues.has(context)) {
+            throw Error("You forgot to set the context for context " + context.displayName + " to useContext");
         }
-        var contextValue = this.contextStore.current;
+        var contextValue = this.contextValues.get(context);
         if (this.verbose) {
-            console.log('Getting value from context', this.contextStore.pointer, ':', contextValue);
+            console.log('Getting value from context', context.displayName, ':', contextValue);
         }
-        this.contextStore.next();
         return contextValue;
     };
     Jooks.prototype.render = function () {
@@ -434,7 +448,6 @@ var Jooks = /** @class */ (function () {
         this.effectStore.start();
         this.layoutEffectStore.start();
         this.callbackStore.start();
-        this.contextStore.start();
         this.debugStore.start();
         this.refStore.start();
         this.memoStore.start();
@@ -453,7 +466,7 @@ var Jooks = /** @class */ (function () {
                     console.log('Firing effect: ', effect);
                 }
                 var cleanup = effect.effect();
-                if ((0, lodash_1.isFunction)(cleanup)) {
+                if (isFunction(cleanup)) {
                     _this.cleanupFunctions[_this.effectStore.pointer] = cleanup;
                     if (_this.verbose) {
                         console.log('Storing cleanup function for ', _this.cleanupFunctions.length);
@@ -469,7 +482,7 @@ var Jooks = /** @class */ (function () {
                     console.log('Firing layout effect: ', effect);
                 }
                 var cleanup = effect.effect();
-                if ((0, lodash_1.isFunction)(cleanup)) {
+                if (isFunction(cleanup)) {
                     _this.cleanupFunctions[_this.effectStore.pointer + 10000] = cleanup;
                     if (_this.verbose) {
                         console.log('Storing cleanup function for ', effect);
@@ -503,12 +516,26 @@ function init(hook, verbose) {
 }
 exports.init = init;
 exports.default = init;
-var HookStore = /** @class */ (function () {
-    function HookStore(property) {
-        this._pointer = 0;
-        this._store = [];
+var HookStoreBase = /** @class */ (function () {
+    function HookStoreBase(property) {
         this._property = property;
         this._original = react_1.default[property];
+    }
+    HookStoreBase.prototype.setup = function (mockFunction) {
+        react_1.default[this._property] = mockFunction;
+    };
+    HookStoreBase.prototype.restore = function () {
+        react_1.default[this._property] = this._original;
+    };
+    return HookStoreBase;
+}());
+var HookStore = /** @class */ (function (_super) {
+    __extends(HookStore, _super);
+    function HookStore(property) {
+        var _this = _super.call(this, property) || this;
+        _this._pointer = 0;
+        _this._store = [];
+        return _this;
     }
     HookStore.prototype.reset = function () {
         this._pointer = 0;
@@ -516,7 +543,7 @@ var HookStore = /** @class */ (function () {
     };
     HookStore.prototype.setup = function (mockFunction) {
         this.reset();
-        react_1.default[this._property] = mockFunction;
+        _super.prototype.setup.call(this, mockFunction);
     };
     HookStore.prototype.start = function () {
         this._pointer = 0;
@@ -548,8 +575,8 @@ var HookStore = /** @class */ (function () {
     HookStore.prototype.next = function () {
         this._pointer += 1;
     };
-    HookStore.prototype.restore = function () {
-        react_1.default[this._property] = this._original;
-    };
     return HookStore;
-}());
+}(HookStoreBase));
+function isFunction(value) {
+    return typeof value === 'function';
+}

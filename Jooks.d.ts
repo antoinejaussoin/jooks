@@ -1,17 +1,17 @@
 import React from 'react';
-import 'jest';
 export declare class Jooks<F extends Function> {
     private hookFunction;
     private verbose;
+    private contextValues;
     private stateStore;
     private effectStore;
     private layoutEffectStore;
     private callbackStore;
-    private contextStore;
     private debugStore;
     private refStore;
     private memoStore;
     private reducerStore;
+    private contextStore;
     private cleanupFunctions;
     private _renderArgs;
     constructor(hookFunction: F, verbose?: boolean);
