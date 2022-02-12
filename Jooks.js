@@ -431,7 +431,7 @@ var Jooks = /** @class */ (function () {
     };
     Jooks.prototype.mockUseContext = function (context) {
         if (!this.contextValues.has(context)) {
-            throw Error("You forgot to set the context for context " + context.displayName + " to useContext");
+            throw Error("You forgot to set the context for context ".concat(context.displayName, " to useContext"));
         }
         var contextValue = this.contextValues.get(context);
         if (this.verbose) {
