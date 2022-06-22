@@ -79,8 +79,8 @@ var react_1 = __importDefault(require("react"));
 var lodash_isequal_1 = __importDefault(require("lodash.isequal"));
 var Jooks = /** @class */ (function () {
     function Jooks(hookFunction, verbose) {
-        var _this = this;
         if (verbose === void 0) { verbose = false; }
+        var _this = this;
         this.hookFunction = hookFunction;
         this.verbose = verbose;
         /**
