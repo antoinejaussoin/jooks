@@ -403,6 +403,10 @@ This is only necessary when your Hook uses `useContext`. You need to call this a
 
 ## Change Log
 
+### Version 2.0.2
+
+- Upgrading dependencies and fixing the React peer dependency so it works with any version greater than 16.8
+
 ### Version 2.0.1
 
 - Upgrading dependencies for security reasons
